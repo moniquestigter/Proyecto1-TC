@@ -157,24 +157,38 @@ public:
     
     bool checkIfCadenaValidaDFA2(string cadena){
         Estado * temp = inicial;
-        return resolverDFA1_2(temp,cadena,0);
-    }
-    
-    bool resolverDFA1_2(Estado * temp,string cadena,int cont){
-        if(cont < cadena.size()){
-            for(int a = 0;a<temp->transicionesArr.size();a++){
-                string simb = temp->getTransicion(a)->simbolo;
-                    if(simb.at(0) == cadena.at(cont)){
-                        temp = getEstado(temp->getTransicion(a)->estado);
-                        return resolverDFA1_2(temp,cadena,cont+1);
-                    }
-            }
-        } else if (temp->aceptacion && (cont == cadena.size())){
+        if(doDFA(temp,inicial->transicionesArr,cadena,0) == 0){
             return true;
-        } else if(!temp->aceptacion && (cont == cadena.size())){
+        } else{
             return false;
         }
-        return false;
+        
+    }
+    
+    int doDFA(Estado * temp,vector<Arista*> trans, string cadena, int cp){
+        int cont = 0;
+        if(cp == cadena.size()){
+            if(temp->aceptacion)
+                return 0;
+            else
+                return 1;
+        }
+        for(cont = 0;cont<trans.size();cont++){
+            int x = -1;
+            Arista * tempA = trans.at(cont);
+            string n = tempA->simbolo;
+            if(n.at(0) == cadena.at(cp)){
+                x = doDFA(getEstado(tempA->estado),getEstado(tempA->estado)->transicionesArr,cadena,cp+1);
+                if(x == 3){
+                    continue;
+                } else if(x==1){
+                    continue;
+                } else if(x ==0){
+                    return x;
+                }
+            }
+        }
+        return 2;
     }
     
     int NFAtoDFA(int cantS, int cantE){
